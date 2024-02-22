@@ -14,7 +14,7 @@ void build_list(StrList* StrList){
         //free(data);  // Free the allocated memory after insertion
     }
 }
-typedef struct _node {
+typedef struct _node{
     char* _data;
     struct _node * _next;
 } Node;
@@ -43,7 +43,18 @@ StrList* StrList_alloc() {
     return p;
 }
 
-
+void delete_list(StrList* StrList){
+    if (StrList==NULL) return;
+    Node* p1= StrList->_head;
+    Node* p2;
+    while(p1) {
+        p2= p1;
+        p1= p1->_next;
+        Node_free(p2);
+    }
+    StrList->_head =NULL;
+    StrList->_size =0;
+}
 /*
  * Frees the memory and resources allocated to StrList.
  * If StrList==NULL does nothing (same as free).
@@ -122,6 +133,7 @@ char* StrList_firstData(const StrList* StrList){
 
 void StrList_print(const StrList* StrList){
     if(StrList->_head ==NULL){
+        printf("\n");
         return;
     }
     Node* current = StrList->_head;
@@ -160,12 +172,12 @@ int StrList_printLen(const StrList* Strlist){
             current = current->_next;
             count = count + strlen(current->_data);
         }
-        return count;
     }
+    return count;
 }
 
 //compare n'th first chars of two strings
-int isEqualStringN(char s1[], char s2[], int n){
+int isEqualStringN(const char s1[], const char s2[], int n){
     for (int i=0; i<n; i++) {
         if (s1[i] != s2[i]) {
             return 0;
@@ -175,8 +187,8 @@ int isEqualStringN(char s1[], char s2[], int n){
 }
 
 //return how many times s2 contains s1
-int CountSubstring(char *s1, char *s2) {
-    int len1 = strlen(s1), len2 = strlen(s2);
+int CountSubstring(const char *s1, char *s2) {
+    int len1 = (int)strlen(s1), len2 = (int)strlen(s2);
     int count = 0;
     for (int i = 0; i <= len2-len1; i++) {
         if (isEqualStringN(s1, s2+i, len1)) {
@@ -193,7 +205,7 @@ int StrList_count(StrList* StrList, const char* data){
     }else{
         Node* current = StrList->_head;
         while (current->_next != NULL){
-            count = count + CountSubstring(data, &(current->_data));
+            count = count + CountSubstring(data, (current->_data));
             current = current->_next;
         }
         return count;
@@ -203,7 +215,7 @@ int StrList_count(StrList* StrList, const char* data){
 
 //Given strings s1 and s2, remove all the appearences of s1 in the s2
 //////////////////////////////////////////////////////////////////////////////
-void remove_from_string(char *s1, char*s2){
+void remove_from_string(const char *s1, char*s2){
     int s1_len = strlen(s1);
     int s2_len = strlen(s2);
     int count = 0;
@@ -222,6 +234,8 @@ void remove_from_string(char *s1, char*s2){
         s2_len =s2_len - s1_len;
     }
 }
+
+
 /*
 	Given a string and a list, remove all the appearences of this string in the list.
 */
@@ -229,11 +243,21 @@ void StrList_remove(StrList* StrList, const char* data){
     if(StrList->_head == NULL){
         return;
     }else{
+        int count = 0;
         Node* current = StrList->_head;
-        remove_from_string(data, current->_data);
-        while (current->_next != NULL){
-            current = current->_next;
+        if(strcmp(data, current->_data) == 0){
+            StrList_removeAt(StrList, count);
+        }else{
             remove_from_string(data, current->_data);
+        }
+        while (current->_next != NULL){
+            count++;
+            current = current->_next;
+            if(strcmp(data, current->_data) == 0){
+                StrList_removeAt(StrList, count);
+            }else{
+                remove_from_string(data, current->_data);
+            }
         }
     }
 }
@@ -284,14 +308,20 @@ int StrList_isEqual(const StrList* StrList1, const StrList* StrList2){
  * It's the user responsibility to free it with StrList_free.
  */
 StrList* StrList_clone(const StrList* StrList){
-    //define a new StrList as result
-    struct StrList* result = StrList_alloc();
+    // Define a new StrList as result
+    struct _StrList* result = StrList_alloc();
 
-    char *clone_data = NULL;
     Node* current = StrList->_head;
     while(current != NULL){
+        char* clone_data = malloc(strlen(current->_data) + 1);
+        if (clone_data == NULL) {
+            return NULL;
+        }
+        
         strcpy(clone_data, current->_data);
+
         StrList_insertLast(result, clone_data);
+        
         current = current->_next;
     }
     return result;

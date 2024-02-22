@@ -9,11 +9,7 @@ int main() {
     while(choice != 0){
         scanf("%d", &choice);
         if(choice == 1){
-            char flag;
-            scanf(" %c", &flag);
-            if(flag == 'A'){
-                build_list(example);
-            }
+            build_list(example);
         } else if(choice == 2){
             int index = 0;
             char *data = malloc(DATA);
@@ -24,17 +20,19 @@ int main() {
             StrList_print(example);
         } else if(choice == 4){
             int size = StrList_size(example);
-            printf("Size: %d\n", size);
+            printf("%d\n", size);
         } else if(choice == 5){
             int index = 0;
             scanf("%d", &index);
             StrList_printAt(example, index);
         } else if(choice == 6){
-            StrList_printLen(example);
+            int len = StrList_printLen(example);
+            printf("%d\n", len);
         } else if(choice == 7){
             char *data = malloc(DATA);
             scanf("%s", data);
-            StrList_count(example, data);
+            int count = StrList_count(example, data);
+            printf("%d\n", count);
         } else if(choice == 8){
             char *data = malloc(DATA);
             scanf("%s", data);
@@ -46,14 +44,14 @@ int main() {
         } else if(choice == 10){
             StrList_reverse(example);
         } else if(choice == 11){
-            StrList_free(example);
+            delete_list(example);
         } else if(choice == 12){
             StrList_sort(example);
         } else if(choice == 13){
             if(StrList_isSorted(example)){
-                printf("True\n");
+                printf("true\n");
             }else{
-                printf("False\n");
+                printf("false\n");
             }
         }
     }

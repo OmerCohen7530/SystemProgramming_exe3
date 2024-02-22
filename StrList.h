@@ -17,19 +17,23 @@
 /*
  * StrList represents a StrList data structure.
  */
-
+#ifndef LIST
+#define LIST
 struct _StrList;
 typedef struct _StrList StrList;
 
+struct _node;
+typedef struct _node Node;
+#endif
 /*
  * Allocates a new empty StrList.
  * It's the user responsibility to free it with StrList_free.
  */
 StrList* StrList_alloc();
 
-struct _node;
-typedef struct _node Node;
+
 Node* Node_alloc(char* data, Node* next);
+
 void Node_free(Node* node);
 
 /*
@@ -126,9 +130,10 @@ int StrList_isSorted(StrList* StrList);
 //////////////////////////////////////////////////
 void StrList_insertFirst(StrList* StrList,const char* data);
 //compare n'th first chars of two strings
-int isEqualStringN(char s1[], char s2[], int n);
+int isEqualStringN(const char s1[], const char s2[], int n);
 //return how many times s2 contains s1
-int CountSubstring(char *s1, char *s2);
+int CountSubstring(const char *s1, char *s2);
 //Given strings s1 and s2, remove all the appearences of s1 in the s2
 //////////////////////////////////////////////////////////////////////////////
-void remove_from_string(char *s1, char*s2);
+void remove_from_string(const char *s1, char*s2);
+void delete_list(StrList* StrList);
