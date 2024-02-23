@@ -55,5 +55,7 @@ int main() {
             }
         }
     }
+    
+    StrList_free(example);
     return 0;
 }

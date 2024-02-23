@@ -4,16 +4,34 @@
 #include "StrList.h"
 
 void build_list(StrList* StrList){
-    int len;
-    scanf("%d", &len);
-
-    for (int i = 0; i < len; i++) {
+    int length_of_words;
+    scanf("%d", &length_of_words);
+    for (int i = 0; i < length_of_words; i++) {
         char *data = malloc(DATA);
         scanf("%s", data);
         StrList_insertLast(StrList, data);
-        //free(data);  // Free the allocated memory after insertion
     }
 }
+// recieve a string of any size
+char* getDynamicString(FILE* fp, size_t size) {
+    char *str;
+    int ch;
+    size_t len = 0;
+    str = realloc(NULL, sizeof(*str)*size);
+    if(!str)return str;
+    while(EOF!=(ch=fgetc(fp)) && ch != '\n' && ch != ' '){
+        str[len++]=ch;
+        if(len==size){
+            str = realloc(str, sizeof(*str)*(size+=16));
+            if(!str)return str;
+        }
+    }
+    str[len++]='\0';
+
+    return realloc(str, sizeof(*str)*len);
+}
+
+
 typedef struct _node{
     char* _data;
     struct _node * _next;
@@ -23,7 +41,7 @@ struct _StrList {
     Node* _head;
     size_t _size;
 };
-////////////////////////////////////////////////////////////////// Add to .h
+
 Node* Node_alloc(char* data, Node* next) {
     Node* p= (Node*)malloc(sizeof(Node));
     p->_data= data;
@@ -32,9 +50,9 @@ Node* Node_alloc(char* data, Node* next) {
 }
 
 void Node_free(Node* node) {
+    free(node->_data);
     free(node);
 }
-///////////////////////////////////////////////////////////////////////////////////
 
 StrList* StrList_alloc() {
     StrList* p= (StrList*)malloc(sizeof(StrList));
@@ -79,20 +97,19 @@ size_t StrList_size(const StrList* StrList){
 
 void StrList_insertLast(StrList* StrList,const char* data){
     Node* newNode = Node_alloc((char*)data, NULL);
-    //if the StrList is empty
+    
     if (StrList->_head == NULL) {
         StrList->_head = newNode;
     } else {
-        // go to the lst node
+        
         Node* current = StrList->_head;
         while (current->_next != NULL) {
             current = current->_next;
         }
-        // insert the newNode in the end
+        
         current->_next = newNode;
     }
 
-    // increase the size of the list
     StrList->_size++;
 }
 
@@ -201,6 +218,7 @@ int CountSubstring(const char *s1, char *s2) {
 int StrList_count(StrList* StrList, const char* data){
     int count=0;
     if(StrList->_head == NULL){
+        free((char*)data);
         return count;
     }else{
         Node* current = StrList->_head;
@@ -208,28 +226,26 @@ int StrList_count(StrList* StrList, const char* data){
             count = count + CountSubstring(data, (current->_data));
             current = current->_next;
         }
+        free((char*)data);
         return count;
     }
 }
 
 
 //Given strings s1 and s2, remove all the appearences of s1 in the s2
-//////////////////////////////////////////////////////////////////////////////
 void remove_from_string(const char *s1, char*s2){
     int s1_len = strlen(s1);
     int s2_len = strlen(s2);
     int count = 0;
 
-    // find first appearence
+
     char *first = strstr(s2, s1);
     while (first != NULL) {
-        // number of chars we need to delete
+        
         count = first - s2;
 
-        // Shift the rest of s2 to remove s1
         memmove(first, first + s1_len, s2_len - count - s1_len + 1);
 
-        // Find the next occurrence of s1 in s2
         first = strstr(first, s1);
         s2_len =s2_len - s1_len;
     }
@@ -241,6 +257,7 @@ void remove_from_string(const char *s1, char*s2){
 */
 void StrList_remove(StrList* StrList, const char* data){
     if(StrList->_head == NULL){
+        free((char*)data);
         return;
     }else{
         int count = 0;
@@ -259,6 +276,7 @@ void StrList_remove(StrList* StrList, const char* data){
                 remove_from_string(data, current->_data);
             }
         }
+        free((char*)data);
     }
 }
 
@@ -270,8 +288,10 @@ void StrList_removeAt(StrList* StrList, int index){
     }else if(StrList->_head == NULL){
         return;
     }else if(index == 0){
+        Node* temp = StrList->_head;
         StrList->_head = StrList->_head->_next;
         StrList->_size--;
+        Node_free(temp);
     }else{
         size_t count = 0;
         Node* current = StrList->_head;
@@ -279,8 +299,10 @@ void StrList_removeAt(StrList* StrList, int index){
             current = current->_next;
             count++;
         }
+        Node* temp = current->_next;
         current->_next = current->_next->_next;
         StrList->_size--;
+        Node_free(temp);
     }
 }
 
