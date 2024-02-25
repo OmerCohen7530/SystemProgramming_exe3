@@ -138,4 +138,4 @@ int CountSubstring(const char *s1, char *s2);
 void remove_from_string(const char *s1, char*s2);
 void delete_list(StrList* StrList);
 
-char* getDynamicString(FILE* fp, size_t size);
+char* getDynamicString(FILE* fp, size_t size, int length);

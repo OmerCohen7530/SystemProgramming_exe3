@@ -4,23 +4,33 @@
 #include "StrList.h"
 
 void build_list(StrList* StrList){
+    char temp[10000];
     int length_of_words;
     scanf("%d", &length_of_words);
     for (int i = 0; i < length_of_words; i++) {
-        char *data = malloc(DATA);
-        scanf("%s", data);
+        scanf("%s", temp);
+        int size_word = strlen(temp);
+        char *data = malloc(size_word);
+        strcpy(data, temp);
+        //printf("size of malloc %d ",size_word);
+        //scanf("%s", data);
+    //char *data = getDynamicString(stdin, 16, length_of_words);
         StrList_insertLast(StrList, data);
+        // printf("done");
     }
+    //free(temp);
 }
 // recieve a string of any size
-char* getDynamicString(FILE* fp, size_t size) {
+char* getDynamicString(FILE* fp, size_t size,int length) {
+    int i=0;
     char *str;
     int ch;
     size_t len = 0;
     str = realloc(NULL, sizeof(*str)*size);
     if(!str)return str;
-    while(EOF!=(ch=fgetc(fp)) && ch != '\n' && ch != ' '){
+    while(EOF!=(ch=fgetc(fp)) && ch != '\n' && ch != ' ' && i<=length){
         str[len++]=ch;
+        i++;
         if(len==size){
             str = realloc(str, sizeof(*str)*(size+=16));
             if(!str)return str;
