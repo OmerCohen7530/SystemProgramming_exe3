@@ -226,19 +226,22 @@ int CountSubstring(const char *s1, char *s2) {
 }
 
 int StrList_count(StrList* StrList, const char* data){
-    int count=0;
-    if(StrList->_head == NULL){
-        free((char*)data);
-        return count;
-    }else{
-        Node* current = StrList->_head;
-        while (current->_next != NULL){
-            count = count + CountSubstring(data, (current->_data));
-            current = current->_next;
-        }
+    int count = 0;
+    
+    if (StrList->_head == NULL) {
         free((char*)data);
         return count;
     }
+
+    Node* current = StrList->_head;
+    
+    while (current != NULL) {
+        count += CountSubstring(data, current->_data);
+        current = current->_next;
+    }
+    
+    free((char*)data);
+    return count;
 }
 
 
@@ -266,53 +269,62 @@ void remove_from_string(const char *s1, char*s2){
 	Given a string and a list, remove all the appearences of this string in the list.
 */
 void StrList_remove(StrList* StrList, const char* data){
-    if(StrList->_head == NULL){
+    if (StrList->_head == NULL) {
         free((char*)data);
         return;
-    }else{
-        int count = 0;
-        Node* current = StrList->_head;
-        if(strcmp(data, current->_data) == 0){
-            StrList_removeAt(StrList, count);
-        }else{
-            remove_from_string(data, current->_data);
-        }
-        while (current->_next != NULL){
-            count++;
-            current = current->_next;
-            if(strcmp(data, current->_data) == 0){
-                StrList_removeAt(StrList, count);
-            }else{
-                remove_from_string(data, current->_data);
-            }
-        }
-        free((char*)data);
     }
+
+    Node* current = StrList->_head;
+    Node* previous = NULL;
+    
+    while (current != NULL) {
+        if (strcmp(data, current->_data) == 0) {
+            if (previous == NULL) {
+                StrList->_head = current->_next;
+                Node* temp = current;
+                current = current->_next;
+                Node_free(temp); 
+            } else {
+                previous->_next = current->_next;
+                Node* temp = current;
+                current = current->_next;
+                Node_free(temp); 
+            }
+            StrList->_size--; 
+        } else {
+            previous = current;
+            current = current->_next;
+        }
+    }
+    free((char*)data);
 }
 
 
 
 void StrList_removeAt(StrList* StrList, int index){
-    if(index > StrList->_size){
+    if (index >= StrList->_size || index < 0) {
         return;
-    }else if(StrList->_head == NULL){
+    } else if (StrList->_head == NULL) {
         return;
-    }else if(index == 0){
+    } else if (index == 0) {
         Node* temp = StrList->_head;
         StrList->_head = StrList->_head->_next;
         StrList->_size--;
         Node_free(temp);
-    }else{
+    } else {
         size_t count = 0;
         Node* current = StrList->_head;
-        while (count < index -1){
+        Node* previous = NULL;
+        while (current != NULL && count < index) {
+            previous = current;
             current = current->_next;
             count++;
         }
-        Node* temp = current->_next;
-        current->_next = current->_next->_next;
-        StrList->_size--;
-        Node_free(temp);
+        if (current != NULL) {
+            previous->_next = current->_next;
+            StrList->_size--;
+            Node_free(current);
+        }
     }
 }
 
